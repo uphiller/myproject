@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <!-- Webpage Title -->
+  <title>Hello, world!</title>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <!-- JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  <!-- 구글폰트 -->
+  <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+  <!-- style -->
+  <style type="text/css">
+    * {
+      font-family: 'Stylish', sans-serif;
+    }
+    .wrap {
+      width: 900px;
+      margin: auto;
+    }
+    .comment {
+      color: blue;
+      font-weight: bold;
+    }
+    .form-post {
+      max-width: 500px;
+      padding: 2rem;
+      margin: 2rem auto;
+      border-color: #e9ecef;
+      border-radius: 0.3rem;
+      border: solid;
+      display: block;
+    }
+  </style>
+
+  <script>
+    $(document).ready(function(){
+      getList();
+    })
+    function openBox(){
+      if($("#post-box").css('display') == 'block'){
+        $("#post-box").css('display','none');
+        $("#btn_post").text('포스팅박스 열기');
+      }else{
+        $("#post-box").css('display','block');
+        $("#btn_post").text('포스팅박스 닫기');
+      }
+    }
+
+    function getList(){
+      $.ajax({
+        type: "GET",
+        url: "/post",
+        success: function(response){
+          for(var i = 0 ; i < response.articles.length ; i++){
+
+            var tmpl = getTmpl(response.articles[i].image, response.articles[i].title, response.articles[i].desc, response.articles[i].comment )
+            $("#card-list").append(tmpl);
+          }
+        }
+      })
+    }
+
+    function getTmpl(image, title, desc, comment){
+        let tmpl = '<div class="card">';
+        tmpl += '<img class="card-img-top" src='+image+' alt="Card image cap">';
+        tmpl += '<div class="card-body">';
+        tmpl += '<a href="#" class="card-title">'+title+'</a>';
+        tmpl += '<p class="card-text">'+desc+'</p>';
+        tmpl += '<p class="card-text comment">'+comment+'</p>';
+        tmpl += '</div>';
+        tmpl += '</div>';
+
+        return tmpl;
+    }
+
+    function savePost(){
+
+      if($("#url").val() == ''){
+          alert("url을 입력하세요.")
+      }
+
+      if($("#comment").val() == ''){
+          alert("코멘트를 입력하세요.")
+      }
+
+      $.ajax({
+        type: "POST",
+        url: "/post",
+        data: {url_give:$("#url").val(), comment_give:$("#comment").val()},
+        success: function(response){
+             if(response.reslut == 'success'){
+               alert("저장되었습니다!!")
+               location.reload();
+             }else{
+               alert("메타테그가 정상적이지 않은 URL입니다.")
+             }
+        }
+      })
+    }
+  </script>
+
+</head>
+<body>
+  <div class="wrap">
+    <div class="jumbotron">
+      <h1 class="display-4">나홀로 링크 메모장!</h1>
+      <p class="lead">중요한 링크를 저장해두고, 나중에 볼 수 있는 공간입니다</p>
+      <hr class="my-4">
+      <p class="lead">
+        <a class="btn btn-primary btn-lg" href="#" role="button" onclick="openBox()" id="btn_post">포스팅박스 열기</a>
+      </p>
+    </div>
+
+
+    <div class="form-post" id="post-box">
+      <div>
+        <div class="form-group">
+          <label for="exampleFormControlInput1">아티클 URL</label>
+          <input class="form-control" placeholder="" id="url">
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea1">간단 코멘트</label>
+          <textarea class="form-control" rows="2" id="comment"></textarea>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="savePost()">기사저장</button>
+      </div>
+    </div>
+
+    <div class="card-columns" id="card-list">
+
+
+    </div>
+  </div>
+</body>
+</html>

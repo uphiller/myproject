@@ -15,9 +15,9 @@ def listing():
 
     return jsonify({'result': 'success'})
 
-@app.route('/index', methods=['GET'])
+@app.route('/', methods=['GET'])
 def index():
-    return return render_template("memo.html")
+    return render_template("memo.html")
 
 
 if __name__ == '__main__':
